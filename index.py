@@ -55,8 +55,11 @@ def handle_image(event):
     image = BytesIO(message_content.content)
 
     try:
+        print('0')
         image_text = get_text_by_ms(image)
+        print('1')
         message = TextSendMessage(text=image_text)
+        print('2')
         reply_message(event, message)
 
     except Exception as e:
