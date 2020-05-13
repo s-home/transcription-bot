@@ -55,6 +55,7 @@ def handle_image(event):
     image = BytesIO(message_content.content)
 
     try:
+        print(base64.b64encode(image))
         image_text = get_text_by_ms(image)
         print('1')
         message = TextSendMessage(text=image_text)
@@ -76,12 +77,12 @@ def get_text_by_ms(image_url):
     api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(
         API_KEY)
     print('before open')
-    imgUrl = 'https://www.python.org/static/img/python-logo.png'
-    r = requests.get(imgUrl)
-    img = open(r, 'rb')
-    img_byte = img.read()
-    img_content = base64.b64encode(img_byte)
-    print('img')
+    # imgUrl = 'https://www.python.org/static/img/python-logo.png'
+    # r = requests.get(imgUrl)
+    # img = open(r, 'rb')
+    # img_byte = img.read()
+    # img_content = base64.b64encode(img_byte)
+    # print('img')
     # with open(image_url, "rb") as img:
     #     print('opened')
     #     image_content = base64.b64encode(img.read())
