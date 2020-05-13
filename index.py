@@ -76,6 +76,7 @@ def reply_message(event, messages):
 def get_text_by_ms(image_url):
     api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(
         API_KEY)
+    print(image_url)
     print('before open')
     # with open(image_url, "rb") as img:
     #     print('opened')
