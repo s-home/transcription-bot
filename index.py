@@ -1,23 +1,16 @@
 import os
-from flask import Flask, request, abort
-
-from linebot import (
-    LineBotApi, WebhookHandler
-)
-from linebot.exceptions import (
-    InvalidSignatureError
-)
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
-)
+from io import BytesIO
+from flask import Flask, abort, request
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import (ImageMessage, MessageEvent, TextMessage,
+                            TextSendMessage)
+from vision import get_text_by_ms
 
 app = Flask(__name__)
 
-YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
-YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
-
-line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+line_bot_api = LineBotApi(os.environ["YOUR_CHANNEL_ACCESS_TOKEN"])
+handler = WebhookHandler(os.environ["YOUR_CHANNEL_SECRET"])
 
 
 @app.route("/callback", methods=['POST'])
@@ -40,9 +33,36 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    text = event.message.text
+    if (text.startswith('http')):
+        image_text = get_text_by_ms(text)
+        message = TextSendMessage(text=image_text)
+    else:
+        message = TextSendMessage(text='画像を送信するか、画像のURLを送ってみてね!')
+    reply_message(event, message)
+
+
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image(event):
+    message_id = event.message.id
+    message_content = line_bot_api.get_message_content(message_id)
+    image = BytesIO(message_content.content)
+
+    try:
+        image_text = get_text_by_ms(image=image)
+        message = TextSendMessage(text=image_text)
+
+        reply_message(event, message)
+
+    except Exception as e:
+        reply_message(event, TextSendMessage(text='エラーが発生しました'))
+
+
+def reply_message(event, message):
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=event.message.text))
+        message=message,
+    )
 
 
 if __name__ == "__main__":
