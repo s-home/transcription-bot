@@ -23,7 +23,6 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
 
     # handle webhook body
     try:
@@ -39,10 +38,10 @@ def handle_message(event):
     text = event.message.text
     if (text.startswith('http')):
         image_text = get_text_by_ms(text)
-        message = TextSendMessage(text=image_text)
+        messages = TextSendMessage(text=image_text)
     else:
-        message = TextSendMessage(text='画像を送信するか、画像のURLを送ってみてね!')
-    reply_message(event, message)
+        messages = TextSendMessage(text='画像を送信するか、画像のURLを送ってみてね!')
+    reply_message(event, messages)
 
 
 @handler.add(MessageEvent, message=ImageMessage)
@@ -61,10 +60,10 @@ def handle_image(event):
         reply_message(event, TextSendMessage(text='エラーが発生しました'))
 
 
-def reply_message(event, message):
+def reply_message(event, messages):
     line_bot_api.reply_message(
         event.reply_token,
-        message=message,
+        message=messages,
     )
 
 
