@@ -81,6 +81,7 @@ def get_text_by_ms(image_url):
     img = open(r, 'rb')
     img_byte = img.read()
     img_content = base64.b64encode(img_byte)
+    print('img')
     # with open(image_url, "rb") as img:
     #     print('opened')
     #     image_content = base64.b64encode(img.read())
