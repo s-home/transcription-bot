@@ -63,7 +63,7 @@ def handle_image(event):
 def reply_message(event, messages):
     line_bot_api.reply_message(
         event.reply_token,
-        message=messages,
+        messages,
     )
 
 
