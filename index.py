@@ -57,7 +57,6 @@ def handle_image(event):
     try:
         image_text = get_text_by_ms(image)
         message = TextSendMessage(text=image_text)
-
         reply_message(event, message)
 
     except Exception as e:
@@ -88,7 +87,9 @@ def get_text_by_ms(image_url):
             }]
         })
         res = requests.post(api_url, data=req_body)
-        return res.json()
+        res_json = res.json()
+        labels = res_json['responses'][0]['labelAnnotations']
+        return labels
 
     # if image_url == None and image == None:
     #     return '必要な情報が足りません'
