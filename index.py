@@ -36,7 +36,7 @@ def callback():
 def handle_message(event):
     text = event.message.text
     if (text.startswith('http')):
-        image_text = get_text_by_ms(text)
+        image_text = get_text(text)
         messages = TextSendMessage(text=image_text)
     else:
         messages = TextSendMessage(text='画像を送信するか、画像のURLを送ってみてね!')
@@ -50,7 +50,7 @@ def handle_image(event):
     image = BytesIO(message_content.content)
 
     try:
-        image_text = getText(image)
+        image_text = get_text(image)
         message = TextSendMessage(text=image_text)
         reply_message(event, message)
 
