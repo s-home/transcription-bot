@@ -1,77 +1,79 @@
 import requests
 import os
-from google.cloud import vision
+import settings
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+KEY1 = os.environ["COMPUTER_VISION_API_KEY"]
+
+# locationを東アジアで登録した場合のendpoint
+endpoint = 'https://eastasia.api.cognitive.microsoft.com/vision/v1.0/ocr'
 
 
-def get_text_by_ms(image_url=None, image=None):
-    client = vision.ImageAnnotatorClient()
-    if image_url == None and image == None:
+def get_text(image_url=None, image=None):
+    if image_url is None and image is None:
         return '必要な情報が足りません'
 
+    params = {'visualFeatures': 'Categories,Description,Color'}
+
     if image_url:
-        image = vision.types.Image()
-        image.source.image_uri = image_url
-        response = client.document_text_detection(image=image)
-        texts = response.full_text_annotation.text
-        # for text in texts:
-        #     print('\n"{}"'.format(text.description))
-
-        #     vertices = (['({},{})'.format(vertex.x, vertex.y)
-        #                  for vertex in text.bounding_poly.vertices])
-
-        # print('bounds: {}'.format(','.join(vertices)))
-        # value = '{}'.format(','.join(vertices))
-
-        if response.error.message:
-            raise Exception(
-                '{}\nFor more info on error messages, check: '
-                'https://cloud.google.com/apis/design/errors'.format(
-                    response.error.message))
+        headers = {
+            'Ocp-Apim-Subscription-Key': KEY1,
+            'Content-Type': 'application/json',
+        }
+        data = {'url': image_url}
+        response = requests.post(
+            endpoint,
+            headers=headers,
+            params=params,
+            json=data
+        )
 
     elif image is not None:
-        image = vision.types.Image()
-        image.source.image_uri = image_url
-        response = client.document_text_detection(image=image)
-        texts = response.full_text_annotation.text
+        headers = {
+            'Ocp-Apim-Subscription-Key': KEY1,
+            "Content-Type": "application/octet-stream"
+        }
+        response = requests.post(
+            endpoint,
+            headers=headers,
+            params=params,
+            data=image,
+        )
 
-    return texts
+    status = response.status_code
+    data = response.json()
 
-    # status = response.status_code
-    # data = response.json()
+    if status != 200:
 
-    # if status != 200:
+        if data['code'] == 'InvalidImageSize':
+            text = '画像のサイズが大きすぎます'
 
-    #     if data['code'] == 'InvalidImageSize':
-    #         text = '画像のサイズが大きすぎます'
+        elif data['code'] == 'InvalidImageUrl':
+            text = 'この画像URLからは取得できません'
 
-    #     elif data['code'] == 'InvalidImageUrl':
-    #         text = 'この画像URLからは取得できません'
+        elif data['code'] == 'InvalidImageFormat':
+            text = '対応していない画像形式です'
 
-    #     elif data['code'] == 'InvalidImageFormat':
-    #         text = '対応していない画像形式です'
+        else:
+            text = 'エラーが発生しました'
 
-    #     else:
-    #         text = 'エラーが発生しました'
+        print(status, data)
+        return text
 
-    #     print(status, data)
-    #     return text
+    text = ''
+    for region in data['regions']:
+        for line in region['lines']:
+            for word in line['words']:
+                text += word.get('text', '')
+                if data['language'] != 'ja':
+                    text += ' '
+        text += '\n'
 
-    # text = ''
-    # for region in data['regions']:
-    #     for line in region['lines']:
-    #         for word in line['words']:
-    #             text += word.get('text', '')
-    #             if data['language'] != 'ja':
-    #                 text += ' '
-    #     text += '\n'
+    if len(text) == 0:
+        text += '文字が検出できませんでした'
 
-    # if len(text) == 0:
-    #     text += '文字が検出できませんでした'
-
-    # print('text:', text)
+    print('text:', text)
+    return text
 
 
 if __name__ == "__main__":
-    get_text_by_ms(image_url)
+    get_text(image_url)
