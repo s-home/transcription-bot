@@ -50,7 +50,7 @@ def handle_image(event):
     image = BytesIO(message_content.content)
 
     try:
-        image_text = get_text(image)
+        image_text = get_text(image=image)
         message = TextSendMessage(text=image_text)
         reply_message(event, message)
 
