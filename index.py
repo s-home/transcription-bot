@@ -75,7 +75,7 @@ def get_text_by_ms(image_url=None, image=None):
 
     if image_url:
         headers = {
-            'Ocp-Apim-Subscription-Key': KEY1,
+            'Ocp-Apim-Subscription-Key': KEY,
             'Content-Type': 'application/json',
         }
         data = {'url': image_url}
@@ -88,7 +88,7 @@ def get_text_by_ms(image_url=None, image=None):
 
     elif image is not None:
         headers = {
-            'Ocp-Apim-Subscription-Key': KEY1,
+            'Ocp-Apim-Subscription-Key': KEY,
             "Content-Type": "application/octet-stream"
         }
         response = requests.post(
