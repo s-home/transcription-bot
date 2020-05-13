@@ -5,7 +5,10 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import (ImageMessage, MessageEvent, TextMessage,
                             TextSendMessage)
-from vision import get_text_by_ms
+# from vision import get_text_by_ms
+from google.cloud import vision
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
 
 app = Flask(__name__)
 
@@ -63,6 +66,31 @@ def reply_message(event, message):
         event.reply_token,
         message=message,
     )
+
+
+def get_text_by_ms(image_url=None, image=None):
+    client = vision.ImageAnnotatorClient()
+    if image_url == None and image == None:
+        return '必要な情報が足りません'
+
+    if image_url:
+        image = vision.types.Image()
+        image.source.image_uri = image_url
+        response = client.document_text_detection(image=image)
+        texts = response.full_text_annotation.text
+        if response.error.message:
+            raise Exception(
+                '{}\nFor more info on error messages, check: '
+                'https://cloud.google.com/apis/design/errors'.format(
+                    response.error.message))
+
+    elif image is not None:
+        image = vision.types.Image()
+        image.source.image_uri = image_url
+        response = client.document_text_detection(image=image)
+        texts = response.full_text_annotation.text
+
+    return texts
 
 
 if __name__ == "__main__":
