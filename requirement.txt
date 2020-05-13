@@ -1,0 +1,13 @@
+line-bot-sdk==1.16.0
+future==0.18.2
+requests==2.23.0
+Flask==1.1.2
+click==7.1.2
+itsdangerous==1.1.0
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+Werkzeug==1.0.1
+certifi==2020.4.5.1
+chardet==3.0.4
+idna==2.9
+urllib3==1.25.9
