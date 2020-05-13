@@ -7,8 +7,12 @@ from linebot.models import (ImageMessage, MessageEvent, TextMessage,
                             TextSendMessage)
 # from vision import get_text_by_ms
 from google.cloud import vision
+import base64
+import json
+import requests
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+API_KEY = os.environ["GOOGLE_API_KEY"]
 
 app = Flask(__name__)
 
@@ -67,29 +71,46 @@ def reply_message(event, messages):
     )
 
 
-def get_text_by_ms(image_url=None, image=None):
-    client = vision.ImageAnnotatorClient()
-    if image_url == None and image == None:
-        return '必要な情報が足りません'
+def get_text_by_ms(image_url):
+    api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(
+        API_KEY)
+    with open(image_url, "rb") as img:
+        image_content = base64.b64encode(img.read())
+        req_body = json.dumps({
+            'requests': [{
+                'image': {
+                    # base64でエンコードしたものjsonにするためdecodeする
+                    'content': image_content.decode('utf-8')
+                },
+                'features': [{
+                    'type': 'TEXT_DETECTION'
+                }]
+            }]
+        })
+        res = requests.post(api_url, data=req_body)
+        return res.json()
 
-    if image_url:
-        image = vision.types.Image()
-        image.source.image_uri = image_url
-        response = client.document_text_detection(image=image)
-        texts = response.full_text_annotation.text
-        if response.error.message:
-            raise Exception(
-                '{}\nFor more info on error messages, check: '
-                'https://cloud.google.com/apis/design/errors'.format(
-                    response.error.message))
+    # if image_url == None and image == None:
+    #     return '必要な情報が足りません'
 
-    elif image is not None:
-        image = vision.types.Image()
-        image.source.image_uri = image_url
-        response = client.document_text_detection(image=image)
-        texts = response.full_text_annotation.text
+    # if image_url:
+    #     image = vision.types.Image()
+    #     image.source.image_uri = image_url
+    #     response = client.document_text_detection(image=image)
+    #     texts = response.full_text_annotation.text
+    #     if response.error.message:
+    #         raise Exception(
+    #             '{}\nFor more info on error messages, check: '
+    #             'https://cloud.google.com/apis/design/errors'.format(
+    #                 response.error.message))
 
-    return texts
+    # elif image is not None:
+    #     image = vision.types.Image()
+    #     image.source.image_uri = image_url
+    #     response = client.document_text_detection(image=image)
+    #     texts = response.full_text_annotation.text
+
+    # return texts
 
 
 if __name__ == "__main__":
