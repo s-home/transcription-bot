@@ -3,8 +3,7 @@ import os
 
 KEY1 = os.environ["COMPUTER_VISION_API_KEY"]
 
-# locationを東アジアで登録した場合のendpoint
-endpoint = 'https://eastasia.api.cognitive.microsoft.com/vision/v1.0/ocr'
+endpoint = 'https://seiya.cognitiveservices.azure.com/'
 
 
 def get_text(image_url=None, image=None):
