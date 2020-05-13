@@ -84,7 +84,7 @@ def get_text_by_ms(image_url):
         'requests': [{
             'image': {
                 # base64でエンコードしたものjsonにするためdecodeする
-                'content': image_url.decode('utf-8')
+                'content': image_url
             },
             'features': [{
                 'type': 'TEXT_DETECTION'
