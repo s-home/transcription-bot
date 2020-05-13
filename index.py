@@ -76,7 +76,9 @@ def reply_message(event, messages):
 def get_text_by_ms(image_url):
     api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(
         API_KEY)
+    print('before open')
     with open(image_url, "rb") as img:
+        print('opened')
         image_content = base64.b64encode(img.read())
         req_body = json.dumps({
             'requests': [{
@@ -89,6 +91,7 @@ def get_text_by_ms(image_url):
                 }]
             }]
         })
+        print('changed')
         res = requests.post(api_url, data=req_body)
         res_json = res.json()
         labels = res_json['responses'][0]['labelAnnotations']
