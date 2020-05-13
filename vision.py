@@ -1,6 +1,5 @@
 import requests
 import os
-import settings
 
 KEY1 = os.environ["COMPUTER_VISION_API_KEY"]
 
