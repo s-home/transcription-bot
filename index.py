@@ -77,25 +77,25 @@ def get_text_by_ms(image_url):
     api_url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(
         API_KEY)
     print('before open')
-    with open(image_url, "rb") as img:
-        print('opened')
-        image_content = base64.b64encode(img.read())
-        req_body = json.dumps({
-            'requests': [{
-                'image': {
-                    # base64でエンコードしたものjsonにするためdecodeする
-                    'content': image_content.decode('utf-8')
-                },
-                'features': [{
-                    'type': 'TEXT_DETECTION'
-                }]
+    # with open(image_url, "rb") as img:
+    #     print('opened')
+    #     image_content = base64.b64encode(img.read())
+    req_body = json.dumps({
+        'requests': [{
+            'image': {
+                # base64でエンコードしたものjsonにするためdecodeする
+                'content': image_url.decode('utf-8')
+            },
+            'features': [{
+                'type': 'TEXT_DETECTION'
             }]
-        })
-        print('changed')
-        res = requests.post(api_url, data=req_body)
-        res_json = res.json()
-        labels = res_json['responses'][0]['labelAnnotations']
-        return labels
+        }]
+    })
+    print('changed')
+    res = requests.post(api_url, data=req_body)
+    res_json = res.json()
+    labels = res_json['responses'][0]['labelAnnotations']
+    return labels
 
     # if image_url == None and image == None:
     #     return '必要な情報が足りません'
