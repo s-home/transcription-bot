@@ -55,7 +55,7 @@ def handle_image(event):
     image = BytesIO(message_content.content)
 
     try:
-        print(message_content)
+        print(image.getvalue)
         image_text = get_text_by_ms(image)
         print('1')
         message = TextSendMessage(text=image_text)
