@@ -3,7 +3,7 @@ import os
 
 KEY1 = os.environ["COMPUTER_VISION_API_KEY"]
 
-endpoint = 'https://seiya.cognitiveservices.azure.com/'
+endpoint = 'https://eastasia.api.cognitive.microsoft.com/vision/v1.0/ocr'
 
 
 def get_text(image_url=None, image=None):
