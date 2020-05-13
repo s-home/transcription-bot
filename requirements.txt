@@ -12,3 +12,5 @@ chardet==3.0.4
 idna==2.9
 urllib3==1.25.9
 google-cloud-vision==1.0.0
+base64
+json
