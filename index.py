@@ -5,14 +5,12 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import (ImageMessage, MessageEvent, TextMessage,
                             TextSendMessage)
-from vision import get_text
+from transcribe import get_text
 
 app = Flask(__name__)
 
 line_bot_api = LineBotApi(os.environ["YOUR_CHANNEL_ACCESS_TOKEN"])
 handler = WebhookHandler(os.environ["YOUR_CHANNEL_SECRET"])
-KEY = os.environ["COMPUTER_VISION_API_KEY"]
-endpoint = 'https://eastasia.api.cognitive.microsoft.com/vision/v1.0/ocr'
 
 
 @app.route("/callback", methods=['POST'])
@@ -34,12 +32,7 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    text = event.message.text
-    if (text.startswith('http')):
-        image_text = get_text(text)
-        messages = TextSendMessage(text=image_text)
-    else:
-        messages = TextSendMessage(text='画像を送信するか、画像のURLを送ってみてね!')
+    messages = TextSendMessage(text='画像を送信してみてね!')
     reply_message(event, messages)
 
 
@@ -50,7 +43,7 @@ def handle_image(event):
     image = BytesIO(message_content.content)
 
     try:
-        image_text = get_text(image=image)
+        image_text = get_text(image)
         message = TextSendMessage(text=image_text)
         reply_message(event, message)
 
